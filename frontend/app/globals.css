@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-tinta: #0e1013;
+  --color-grafito: #181b20;
+  --color-papel: #e8e1d0;
+  --color-evidencia: #b3262e;
+  --color-alerta: #d9a441;
+}
+
+body {
+  background-color: var(--color-tinta);
+  color: var(--color-papel);
+  min-height: 100vh;
+  font-family: var(--font-ibm-plex-sans), sans-serif;
+}
