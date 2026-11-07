@@ -1,0 +1,121 @@
+// Esquema de Prisma vinculante para el Sistema de Investigación Criminal
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum RecordState {
+  ACTIVE
+  INACTIVE
+}
+
+enum CaseStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+enum SuspectStatus {
+  PERSON_OF_INTEREST
+  DETAINED
+  CLEARED
+}
+
+enum EvidenceType {
+  PHYSICAL
+  DIGITAL
+  DOCUMENT
+  TESTIMONY
+  FORENSIC
+}
+
+model User {
+  id           String      @id @default(uuid())
+  name         String
+  email        String      @unique
+  passwordHash String
+  role         Role        @default(USER)
+  state        RecordState @default(ACTIVE)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  cases        Case[]
+
+  @@map("users")
+}
+
+model Case {
+  id           String      @id @default(uuid())
+  caseNumber   Int         @unique @default(autoincrement())
+  title        String
+  description  String      @db.Text
+  location     String
+  incidentDate DateTime
+  status       CaseStatus  @default(OPEN)
+  imageUrl     String?
+  state        RecordState @default(ACTIVE)
+  ownerId      String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  owner        User        @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  suspects     Suspect[]
+  evidences    Evidence[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@map("cases")
+}
+
+model Suspect {
+  id             String        @id @default(uuid())
+  fullName       String
+  alias          String?
+  description    String?
+  suspicionLevel Int           @default(0)
+  status         SuspectStatus @default(PERSON_OF_INTEREST)
+  photoUrl       String?
+  state          RecordState   @default(ACTIVE)
+  caseId         String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  case           Case          @relation(fields: [caseId], references: [id], onDelete: Restrict)
+  evidences      Evidence[]
+
+  @@index([caseId])
+  @@map("suspects")
+}
+
+model Evidence {
+  id          String       @id @default(uuid())
+  title       String
+  description String
+  type        EvidenceType
+  collectedAt DateTime
+  relevance   Int
+  imageUrl    String?
+  state       RecordState  @default(ACTIVE)
+  caseId      String
+  suspectId   String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  case        Case         @relation(fields: [caseId], references: [id], onDelete: Restrict)
+  suspect     Suspect?     @relation(fields: [suspectId], references: [id], onDelete: Restrict)
+
+  @@index([caseId])
+  @@index([suspectId])
+  @@map("evidences")
+}
