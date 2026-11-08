@@ -1,25 +1,38 @@
 'use client';
 
+import React, { Suspense } from 'react';
 import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import { useAuth } from '../../src/features/auth';
-import { Button } from '../../src/features/common/components';
+import { CasesList } from '../../src/features/cases';
+import { Button, Spinner } from '../../src/features/common/components';
 
 export default function CasesPage() {
   const { user, logout } = useAuth();
 
   return (
-    <div className="max-w-5xl w-full mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between pb-4 border-b border-grafito-light">
+    <div className="max-w-6xl w-full mx-auto p-4 sm:p-6 space-y-6">
+      {/* Cabecera provisional que conserva cerrar sesión y panel admin hasta entrega de Navbar por D */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-grafito-light">
         <div>
           <span className="text-[10px] font-mono tracking-widest uppercase text-alerta">
-            MÓDULO DE CASOS
+            ARCHIVO GENERAL DE INVESTIGACIONES FORENSES
           </span>
-          <h1 className="font-serif text-2xl text-papel mt-1">Expedientes en Curso</h1>
-          <p className="text-xs font-mono text-papel-muted">
-            Sesión activa: {user?.name} ({user?.role})
+          <h1 className="font-serif text-2xl sm:text-3xl text-papel mt-1">
+            Expedientes Criminales
+          </h1>
+          <p className="text-xs font-mono text-papel-muted mt-0.5">
+            Agente en servicio: <strong className="text-papel">{user?.name}</strong> [{user?.role}]
           </p>
         </div>
-        <div className="flex items-center gap-3">
+
+        <div className="flex items-center flex-wrap gap-3">
+          <Link href="/cases/new">
+            <Button variant="primary" className="inline-flex items-center gap-2 text-xs">
+              <Plus className="w-4 h-4" />
+              <span>NUEVO EXPEDIENTE</span>
+            </Button>
+          </Link>
           {user?.role === 'ADMIN' && (
             <Link
               href="/admin"
@@ -34,15 +47,10 @@ export default function CasesPage() {
         </div>
       </div>
 
-      <div className="border border-dashed border-grafito-light bg-grafito p-8 text-center space-y-3">
-        <span className="text-xs font-mono uppercase text-alerta">[REBANADA B EN DESARROLLO]</span>
-        <h2 className="font-serif text-lg text-papel">Listado de Casos e Investigaciones</h2>
-        <p className="text-xs text-papel-muted max-w-md mx-auto">
-          Esta vista está reservada para el Integrante B (Casos e Imágenes). La autenticación,
-          protección de rutas y sesión persistente provistas por la Fundación (Integrante A) están
-          completamente operativas.
-        </p>
-      </div>
+      {/* Listado central de casos */}
+      <Suspense fallback={<Spinner className="w-8 h-8 mx-auto" />}>
+        <CasesList />
+      </Suspense>
     </div>
   );
 }
