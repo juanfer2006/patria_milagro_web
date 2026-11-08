@@ -2,17 +2,177 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =======================================================================
+   TOKENS DE DISEÑO: SISTEMA FORENSE NOIR (INTEGRANTE D)
+   Paleta acordada:
+   - Tinta: #0E1013
+   - Grafito: #181B20
+   - Papel: #E8E1D0
+   - Rojo Evidencia: #B3262E
+   - Ámbar Alerta: #D9A441
+   ======================================================================= */
+
 :root {
+  color-scheme: dark;
   --color-tinta: #0e1013;
   --color-grafito: #181b20;
+  --color-grafito-dark: #131518;
+  --color-grafito-light: #242930;
   --color-papel: #e8e1d0;
+  --color-papel-dark: #c8bea8;
+  --color-papel-muted: #8f897b;
   --color-evidencia: #b3262e;
+  --color-evidencia-hover: #941f26;
   --color-alerta: #d9a441;
+  --color-alerta-hover: #ba882f;
 }
+
+[data-theme='light'] {
+  color-scheme: light;
+  --color-tinta: #f5efe1;
+  --color-grafito: #e7dfcc;
+  --color-grafito-dark: #dcceb8;
+  --color-grafito-light: #b8ac95;
+  --color-papel: #14171a;
+  --color-papel-dark: #2c3038;
+  --color-papel-muted: #5e594f;
+  --color-evidencia: #b3262e;
+  --color-evidencia-hover: #941f26;
+  --color-alerta: #9e6b12;
+  --color-alerta-hover: #82570b;
+}
+
+/* =======================================================================
+   ADAPTACIONES DE CLASES TAILWIND PARA TEMA CLARO "PAPEL FORENSE"
+   ======================================================================= */
+
+[data-theme='light'] body {
+  background-color: var(--color-tinta);
+  color: var(--color-papel);
+}
+
+[data-theme='light'] .bg-tinta {
+  background-color: #f5efe1 !important;
+}
+
+[data-theme='light'] .bg-grafito {
+  background-color: #e7dfcc !important;
+}
+
+[data-theme='light'] .bg-grafito-dark {
+  background-color: #dcceb8 !important;
+}
+
+[data-theme='light'] .bg-grafito-dark\/50 {
+  background-color: rgba(220, 206, 184, 0.5) !important;
+}
+
+[data-theme='light'] .bg-grafito-dark\/60 {
+  background-color: rgba(220, 206, 184, 0.6) !important;
+}
+
+[data-theme='light'] .bg-grafito-light {
+  background-color: #cbbeaa !important;
+}
+
+[data-theme='light'] .border-grafito-light {
+  border-color: #b8ac95 !important;
+}
+
+[data-theme='light'] .border-grafito-light\/60 {
+  border-color: rgba(184, 172, 149, 0.6) !important;
+}
+
+[data-theme='light'] .text-papel {
+  color: #14171a !important;
+}
+
+[data-theme='light'] .text-papel-dark {
+  color: #2c3038 !important;
+}
+
+[data-theme='light'] .text-papel-muted {
+  color: #5e594f !important;
+}
+
+[data-theme='light'] select,
+[data-theme='light'] input,
+[data-theme='light'] textarea {
+  background-color: #fcf9f2 !important;
+  color: #14171a !important;
+  border-color: #b8ac95 !important;
+}
+
+[data-theme='light'] select option {
+  background-color: #f5efe1 !important;
+  color: #14171a !important;
+}
+
+/* =======================================================================
+   ESTILOS GENERALES Y FORENSE NOIR
+   ======================================================================= */
 
 body {
   background-color: var(--color-tinta);
   color: var(--color-papel);
   min-height: 100vh;
   font-family: var(--font-ibm-plex-sans), sans-serif;
+}
+
+/* Sello de Confidencialidad Forense */
+.stamp-confidential {
+  display: inline-block;
+  font-family: var(--font-special-elite), serif;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-evidencia);
+  border: 2px solid var(--color-evidencia);
+  padding: 0.25rem 0.75rem;
+  transform: rotate(-2deg);
+  user-select: none;
+  mask-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 1));
+}
+
+/* Cinta de Escena del Crimen / Evidencia */
+.evidence-tape {
+  background-color: var(--color-alerta);
+  color: #0e1013;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.6rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Scrollbar con estilo forense */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-grafito-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-grafito-light);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-alerta);
+}
+
+/* Respeto a usuarios con preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
