@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ListUsersUseCase } from '../src/application/use-cases/users/list-users.use-case.js';
 import { DeactivateUserUseCase } from '../src/application/use-cases/users/deactivate-user.use-case.js';
 import { ConflictError, NotFoundError } from '../src/application/errors/app-error.js';
