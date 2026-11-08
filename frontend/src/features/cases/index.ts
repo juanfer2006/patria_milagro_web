@@ -18,3 +18,4 @@ export { CaseCard } from './components/CaseCard';
 export { CaseStatusBadge } from './components/CaseStatusBadge';
 export { CaseFilters } from './components/CaseFilters';
 export { CaseForm } from './components/CaseForm';
+export { CaseDetailView } from './components/CaseDetailView';
