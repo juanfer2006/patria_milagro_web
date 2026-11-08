@@ -306,33 +306,3 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ message, onRetry }) => (
     )}
   </div>
 );
-
-// ImageUpload
-export interface ImageUploadProps {
-  value?: string;
-  onChange: (url: string) => void;
-  folder: 'cases' | 'suspects' | 'evidences';
-  label?: string;
-}
-
-export const ImageUpload: React.FC<ImageUploadProps> = ({
-  value,
-  onChange,
-  folder,
-  label = 'Fotografía / Evidencia',
-}) => {
-  return (
-    <div className="space-y-1">
-      <label className="block text-xs font-mono tracking-wider text-papel-dark uppercase">
-        {label} ({folder})
-      </label>
-      <input
-        type="text"
-        placeholder="URL o subida de imagen provisional"
-        value={value || ''}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 bg-grafito-dark border border-grafito-light text-papel text-sm focus:outline-none focus:ring-1 focus:ring-alerta"
-      />
-    </div>
-  );
-};
