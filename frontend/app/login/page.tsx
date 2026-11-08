@@ -7,7 +7,7 @@ import { useAuth } from '../../src/features/auth';
 import { Input, Button, Spinner } from '../../src/features/common/components';
 import { ApiError } from '../../src/features/common/domain/api-error';
 
-function LoginForm() {
+function LoginFormInner() {
   const { login } = useAuth();
   const searchParams = useSearchParams();
 
@@ -129,13 +129,11 @@ export default function LoginPage() {
     <Suspense
       fallback={
         <div className="flex-1 flex items-center justify-center p-6">
-          <div className="w-full max-w-md border border-grafito-light bg-grafito p-8 shadow-2xl flex justify-center">
-            <Spinner />
-          </div>
+          <Spinner />
         </div>
       }
     >
-      <LoginForm />
+      <LoginFormInner />
     </Suspense>
   );
 }
