@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../../src/features/auth';
-import { Input, Button } from '../../src/features/common/components';
+import { Input, Button, Spinner } from '../../src/features/common/components';
 import { ApiError } from '../../src/features/common/domain/api-error';
 
-export default function LoginPage() {
+function LoginForm() {
   const { login } = useAuth();
   const searchParams = useSearchParams();
 
@@ -121,5 +121,21 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex-1 flex items-center justify-center p-6">
+          <div className="w-full max-w-md border border-grafito-light bg-grafito p-8 shadow-2xl flex justify-center">
+            <Spinner />
+          </div>
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
