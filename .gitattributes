@@ -1,0 +1,15 @@
+# Normaliza finales de línea a LF en todos los archivos de texto del repositorio.
+# Esto evita alertas de prettier en entornos Windows (CRLF vs LF).
+* text=auto eol=lf
+
+# Archivos binarios: no tocar sus bytes
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
