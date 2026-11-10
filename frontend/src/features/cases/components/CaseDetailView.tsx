@@ -4,20 +4,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import {
-  ArrowLeft,
-  Calendar,
-  MapPin,
-  Edit,
-  Trash2,
-  Users,
-  Lock,
-} from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, Edit, Trash2, Users, Lock } from 'lucide-react';
 import { Case, formatCaseCode } from '../domain/case';
 import { casesService } from '../services/cases.service';
 import { CaseStatusBadge } from './CaseStatusBadge';
 import { ConfirmDialog, Button, ErrorState } from '../../common/components';
 import { EvidencesSection } from '../../evidences';
+import { SuspectsSection } from '../../suspects';
 
 export interface CaseDetailViewProps {
   caseData: Case;
@@ -39,11 +32,12 @@ export const SuspectsSectionPlaceholder: React.FC<{
       </span>
     </div>
     <p className="text-xs text-papel-muted leading-relaxed">
-      Esta sección listará los sospechosos vinculados a este expediente y permitirá asociar nivel
-      de sospecha (0-100) y fotografía.
+      Esta sección listará los sospechosos vinculados a este expediente y permitirá asociar nivel de
+      sospecha (0-100) y fotografía.
       {isCaseClosed && (
         <span className="block text-evidencia mt-1 font-mono">
-          * El expediente está cerrado: la adición de nuevos sospechosos está deshabilitada (Regla 3).
+          * El expediente está cerrado: la adición de nuevos sospechosos está deshabilitada (Regla
+          3).
         </span>
       )}
     </p>
@@ -126,7 +120,8 @@ export const CaseDetailView: React.FC<CaseDetailViewProps> = ({ caseData }) => {
             <strong className="text-alerta tracking-wider uppercase">[EXPEDIENTE CERRADO]</strong>
             <p className="mt-0.5 text-papel-dark">
               Esta investigación se encuentra formalmente concluida. Se permite su reapertura o
-              edición, pero no se pueden anexar nuevos sospechosos ni evidencias conforme a la Regla de Negocio 3.
+              edición, pero no se pueden anexar nuevos sospechosos ni evidencias conforme a la Regla
+              de Negocio 3.
             </p>
           </div>
         </div>
@@ -197,7 +192,7 @@ export const CaseDetailView: React.FC<CaseDetailViewProps> = ({ caseData }) => {
 
       {/* Secciones vinculadas: Sospechosos (C) y Evidencias (D) */}
       <section className="space-y-6 pt-4">
-        <SuspectsSectionPlaceholder caseId={caseData.id} isCaseClosed={isCaseClosed} />
+        <SuspectsSection caseId={caseData.id} isCaseClosed={isCaseClosed} />
         <EvidencesSection caseId={caseData.id} isCaseClosed={isCaseClosed} />
       </section>
 

@@ -85,6 +85,7 @@ class MockSuspectRepository implements ISuspectRepository {
     if (idx === -1) throw new Error('Not found');
 
     const current = this.items[idx];
+    if (!current) throw new Error('Not found');
     const updated: SuspectEntity = {
       ...current,
       ...(data.fullName !== undefined ? { fullName: data.fullName } : {}),
@@ -155,7 +156,7 @@ describe('Suspects Use Cases', () => {
 
   describe('CreateSuspectUseCase', () => {
     it('debe crear un sospechoso exitosamente cuando el caso pertenece al usuario', async () => {
-      const useCase = new CreateSuspectUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new CreateSuspectUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
 
       const result = await useCase.execute(
         {
@@ -175,7 +176,7 @@ describe('Suspects Use Cases', () => {
     });
 
     it('debe permitir crear sospechoso a un ADMIN en cualquier caso', async () => {
-      const useCase = new CreateSuspectUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new CreateSuspectUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
 
       const result = await useCase.execute(
         {
@@ -189,7 +190,7 @@ describe('Suspects Use Cases', () => {
     });
 
     it('debe lanzar NotFoundError (404) si el caso no existe o pertenece a otro usuario', async () => {
-      const useCase = new CreateSuspectUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new CreateSuspectUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
 
       await expect(
         useCase.execute(
@@ -213,7 +214,7 @@ describe('Suspects Use Cases', () => {
     });
 
     it('debe lanzar ConflictError (409) si el caso está CLOSED (Regla 3)', async () => {
-      const useCase = new CreateSuspectUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new CreateSuspectUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
 
       await expect(
         useCase.execute(
@@ -234,7 +235,7 @@ describe('Suspects Use Cases', () => {
         fullName: 'Carlos Ruiz',
       });
 
-      const useCase = new GetSuspectUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new GetSuspectUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
       const result = await useCase.execute(suspect.id, actorUser);
 
       expect(result.id).toBe(suspect.id);
@@ -248,7 +249,7 @@ describe('Suspects Use Cases', () => {
       });
       suspect.state = RecordState.INACTIVE;
 
-      const useCase = new GetSuspectUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new GetSuspectUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
       await expect(useCase.execute(suspect.id, actorUser)).rejects.toThrow(NotFoundError);
     });
 
@@ -258,7 +259,7 @@ describe('Suspects Use Cases', () => {
         fullName: 'Carlos Ruiz',
       });
 
-      const useCase = new GetSuspectUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new GetSuspectUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
       await expect(useCase.execute(suspect.id, actorOtherUser)).rejects.toThrow(NotFoundError);
     });
   });
@@ -271,7 +272,7 @@ describe('Suspects Use Cases', () => {
         suspicionLevel: 20,
       });
 
-      const useCase = new UpdateSuspectUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new UpdateSuspectUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
       const updated = await useCase.execute(
         suspect.id,
         {
@@ -293,7 +294,7 @@ describe('Suspects Use Cases', () => {
         fullName: 'Sospechoso Caso Cerrado',
       });
 
-      const useCase = new UpdateSuspectUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new UpdateSuspectUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
       const updated = await useCase.execute(
         suspect.id,
         {
@@ -313,7 +314,7 @@ describe('Suspects Use Cases', () => {
         fullName: 'Para Eliminar',
       });
 
-      const useCase = new DeleteSuspectUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new DeleteSuspectUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
       await useCase.execute(suspect.id, actorUser);
 
       const found = await suspectRepo.findById(suspect.id);
@@ -339,7 +340,7 @@ describe('Suspects Use Cases', () => {
     });
 
     it('debe listar sospechosos con paginación', async () => {
-      const useCase = new ListSuspectsUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new ListSuspectsUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
       const result = await useCase.execute({ caseId: 'case-100' }, 1, 10, actorUser);
 
       expect(result.items).toHaveLength(2);
@@ -347,15 +348,15 @@ describe('Suspects Use Cases', () => {
     });
 
     it('debe filtrar sospechosos por búsqueda q (nombre o alias)', async () => {
-      const useCase = new ListSuspectsUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new ListSuspectsUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
       const result = await useCase.execute({ caseId: 'case-100', q: 'Rápido' }, 1, 10, actorUser);
 
       expect(result.items).toHaveLength(1);
-      expect(result.items[0].fullName).toBe('Juan Lopez');
+      expect(result.items[0]?.fullName).toBe('Juan Lopez');
     });
 
     it('debe filtrar sospechosos por status', async () => {
-      const useCase = new ListSuspectsUseCase(suspectRepo, caseRepo as ICaseRepository);
+      const useCase = new ListSuspectsUseCase(suspectRepo, caseRepo as unknown as ICaseRepository);
       const result = await useCase.execute(
         { caseId: 'case-100', status: SuspectStatus.DETAINED },
         1,
@@ -364,7 +365,7 @@ describe('Suspects Use Cases', () => {
       );
 
       expect(result.items).toHaveLength(1);
-      expect(result.items[0].fullName).toBe('Pedro Gomez');
+      expect(result.items[0]?.fullName).toBe('Pedro Gomez');
     });
   });
 });

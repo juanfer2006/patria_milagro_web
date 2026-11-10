@@ -1,23 +1,17 @@
-import { httpClient } from '../../common/http/http-client';
+import { suspectsService, Suspect } from '../../suspects';
 
-export interface SuspectLookupOption {
-  id: string;
-  fullName: string;
-  alias?: string | null;
-}
+export type SuspectLookupOption = Suspect;
 
 /**
- * Consulta de apoyo para obtener los sospechosos asociados a un caso
- * Permite seleccionar el sospechoso vinculado al crear o editar una evidencia.
+ * Consulta oficial de sospechosos utilizando el servicio suspectsService
+ * de la feature suspects (Rebanada C) para permitir asociar sospechosos
+ * a evidencias forenses del caso.
  */
 export async function fetchCaseSuspectsLookup(caseId: string): Promise<SuspectLookupOption[]> {
   try {
-    const response = await httpClient.get<{ data: SuspectLookupOption[] }>('/suspects', {
-      params: { caseId, limit: 50 },
-    });
+    const response = await suspectsService.list({ caseId }, 1, 50);
     return response.data || [];
   } catch {
-    // Si la rebanada C de sospechosos aún no está lista o no retorna datos
     return [];
   }
 }
