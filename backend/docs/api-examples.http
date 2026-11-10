@@ -1,0 +1,136 @@
+### ==============================================================================
+### SISTEMA DE INVESTIGACIÓN CRIMINAL — EJEMPLOS DE API HTTP
+### Rebanada C: Integrante C (Camilo Gutiérrez Castañeda)
+### Compatible con REST Client (VS Code) o IntelliJ HTTP Client
+### ==============================================================================
+
+@host = http://localhost:4000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ejemploToken
+@caseId = 123e4567-e89b-12d3-a456-426614174000
+@suspectId = 987fcdeb-51a2-43f7-9876-543210987654
+
+### ------------------------------------------------------------------------------
+### 1. HEALTH CHECK (Público)
+### ------------------------------------------------------------------------------
+GET {{host}}/api/health
+
+### ------------------------------------------------------------------------------
+### 2. AUTENTICACIÓN
+### ------------------------------------------------------------------------------
+
+### Registro de usuario estándar
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Detective Salazar",
+  "email": "detective.salazar@policia.gob",
+  "password": "Password123"
+}
+
+### Inicio de sesión
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "detective.salazar@policia.gob",
+  "password": "Password123"
+}
+
+### Perfil del usuario actual
+GET {{host}}/api/auth/me
+Authorization: Bearer {{token}}
+
+### ------------------------------------------------------------------------------
+### 3. EXPEDIENTES (CASOS)
+### ------------------------------------------------------------------------------
+
+### Listar casos
+GET {{host}}/api/cases?page=1&limit=10&status=OPEN
+Authorization: Bearer {{token}}
+
+### Crear caso
+POST {{host}}/api/cases
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Homicidio en callejón noir",
+  "description": "Hallazgo de cuerpo sin vida con signos de violencia en el sector bancario.",
+  "location": "Sector Bancario Calle 45",
+  "incidentDate": "2026-11-05T03:30:00.000Z",
+  "status": "OPEN"
+}
+
+### ------------------------------------------------------------------------------
+### 4. SOSPECHOSOS (REBANADA C)
+### ------------------------------------------------------------------------------
+
+### Listar sospechosos (con filtros combinados de búsqueda, estado y caso)
+GET {{host}}/api/suspects?page=1&limit=10&caseId={{caseId}}&status=PERSON_OF_INTEREST&q=Carlos
+Authorization: Bearer {{token}}
+
+### Registrar nuevo sospechoso en un caso
+POST {{host}}/api/suspects
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "caseId": "{{caseId}}",
+  "fullName": "Carlos 'El Lobo' Mendoza",
+  "alias": "El Lobo",
+  "description": "Visto merodeando la escena del crimen 15 minutos antes de los hechos.",
+  "suspicionLevel": 85,
+  "status": "PERSON_OF_INTEREST",
+  "photoUrl": "https://supabase.co/storage/v1/object/public/case-images/suspects/lobo.jpg"
+}
+
+### Consultar detalle de un sospechoso
+GET {{host}}/api/suspects/{{suspectId}}
+Authorization: Bearer {{token}}
+
+### Actualizar sospechoso (nivel de sospecha, estado, foto o descripción)
+PUT {{host}}/api/suspects/{{suspectId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "fullName": "Carlos Alberto Mendoza",
+  "alias": "El Lobo Solitario",
+  "description": "Detenido preventivamente tras hallazgo de huellas dactilares coincidentes.",
+  "suspicionLevel": 95,
+  "status": "DETAINED",
+  "photoUrl": "https://supabase.co/storage/v1/object/public/case-images/suspects/lobo-detained.jpg"
+}
+
+### Eliminar sospechoso (borrado lógico y desvinculación de evidencias asociadas)
+DELETE {{host}}/api/suspects/{{suspectId}}
+Authorization: Bearer {{token}}
+
+### ------------------------------------------------------------------------------
+### 5. EVIDENCIAS
+### ------------------------------------------------------------------------------
+
+### Listar evidencias de un caso
+GET {{host}}/api/evidences?page=1&limit=10&caseId={{caseId}}
+Authorization: Bearer {{token}}
+
+### ------------------------------------------------------------------------------
+### 6. SUBIDA DE ARCHIVOS (IMÁGENES A STORAGE)
+### ------------------------------------------------------------------------------
+
+### Subir imagen de sospechoso a Supabase Storage
+POST {{host}}/api/uploads
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="folder"
+
+suspects
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="mugshot.jpg"
+Content-Type: image/jpeg
+
+< ./mugshot.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
