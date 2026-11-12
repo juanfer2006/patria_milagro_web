@@ -16,6 +16,16 @@ export function useEvidences(caseId: string) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const loadSuspects = useCallback(async () => {
+    if (!caseId) return;
+    try {
+      const suspectsData = await fetchCaseSuspectsLookup(caseId);
+      setSuspects(suspectsData);
+    } catch (err: unknown) {
+      console.error('Error al sincronizar sospechosos del caso:', err);
+    }
+  }, [caseId]);
+
   const loadData = useCallback(async () => {
     if (!caseId) return;
     setIsLoading(true);
@@ -43,6 +53,23 @@ export function useEvidences(caseId: string) {
     loadData();
   }, [loadData]);
 
+  // Sincronizar automáticamente cuando se añade, actualiza o elimina un sospechoso en la vista
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleSuspectsChanged = (e: Event) => {
+      const customEvent = e as CustomEvent<{ caseId?: string }>;
+      if (!customEvent.detail?.caseId || customEvent.detail.caseId === caseId) {
+        loadSuspects();
+      }
+    };
+
+    window.addEventListener('suspects:changed', handleSuspectsChanged);
+    return () => {
+      window.removeEventListener('suspects:changed', handleSuspectsChanged);
+    };
+  }, [caseId, loadSuspects]);
+
   const createEvidence = async (payload: Omit<CreateEvidencePayload, 'caseId'>) => {
     const created = await evidencesService.create({
       ...payload,
@@ -69,6 +96,7 @@ export function useEvidences(caseId: string) {
     isLoading,
     error,
     refresh: loadData,
+    refreshSuspects: loadSuspects,
     createEvidence,
     updateEvidence,
     deleteEvidence,

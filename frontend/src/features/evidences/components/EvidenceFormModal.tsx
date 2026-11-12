@@ -17,7 +17,7 @@ import {
   EvidenceTypeLabels,
   RelevanceDescriptions,
 } from '../domain/evidence';
-import { SuspectLookupOption } from '../services/suspects-lookup';
+import { fetchCaseSuspectsLookup, SuspectLookupOption } from '../services/suspects-lookup';
 import { CreateEvidencePayload, UpdateEvidencePayload } from '../services/evidences.service';
 
 export interface EvidenceFormModalProps {
@@ -32,7 +32,7 @@ export interface EvidenceFormModalProps {
 export const EvidenceFormModal: React.FC<EvidenceFormModalProps> = ({
   open,
   onClose,
-  caseId: _caseId,
+  caseId,
   initialData,
   suspects,
   onSubmit,
@@ -47,8 +47,35 @@ export const EvidenceFormModal: React.FC<EvidenceFormModalProps> = ({
   const [suspectId, setSuspectId] = useState<string>('');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
+  const [availableSuspects, setAvailableSuspects] = useState<SuspectLookupOption[]>(suspects);
+  const [loadingSuspects, setLoadingSuspects] = useState<boolean>(false);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sincronizar sospechosos iniciales provistos por el padre
+  useEffect(() => {
+    if (suspects && suspects.length > 0) {
+      setAvailableSuspects(suspects);
+    }
+  }, [suspects]);
+
+  // Al abrir el modal, consultar la lista más reciente de sospechosos del caso
+  useEffect(() => {
+    if (open && caseId) {
+      setLoadingSuspects(true);
+      fetchCaseSuspectsLookup(caseId)
+        .then((items) => {
+          setAvailableSuspects(items);
+        })
+        .catch((err) => {
+          console.error('Error al actualizar opciones de sospechosos para la evidencia:', err);
+        })
+        .finally(() => {
+          setLoadingSuspects(false);
+        });
+    }
+  }, [open, caseId]);
 
   // Fecha máxima permitida (ahora mismo, formateada a YYYY-MM-DDTHH:mm)
   const maxDateTime = new Date(Date.now() + 60000).toISOString().slice(0, 16);
@@ -224,10 +251,29 @@ export const EvidenceFormModal: React.FC<EvidenceFormModalProps> = ({
             label="Sospechoso vinculado (opcional)"
             value={suspectId}
             onChange={(e) => setSuspectId(e.target.value)}
-            hint="Asocie la evidencia a una persona de interés del caso"
+            hint={
+              loadingSuspects
+                ? 'Actualizando lista de personas de interés...'
+                : 'Asocie la evidencia a una persona de interés del caso'
+            }
           >
             <option value="">-- Ninguno / Sin vincular --</option>
-            {suspects.map((s) => (
+            {loadingSuspects && availableSuspects.length === 0 && (
+              <option value="" disabled>
+                Cargando sospechosos del caso...
+              </option>
+            )}
+            {!loadingSuspects && availableSuspects.length === 0 && (
+              <option value="" disabled>
+                -- No hay sospechosos registrados en este caso --
+              </option>
+            )}
+            {suspectId && !availableSuspects.some((s) => s.id === suspectId) && (
+              <option value={suspectId}>
+                Sospechoso asignado previamente (ID: {suspectId.slice(0, 8)}...)
+              </option>
+            )}
+            {availableSuspects.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.fullName} {s.alias ? `("${s.alias}")` : ''}
               </option>

@@ -66,6 +66,9 @@ export const SuspectsSection: React.FC<SuspectsSectionProps> = ({ caseId, isCase
     } else {
       await createSuspect(data as CreateSuspectInput);
     }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('suspects:changed', { detail: { caseId } }));
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -74,6 +77,9 @@ export const SuspectsSection: React.FC<SuspectsSectionProps> = ({ caseId, isCase
       setIsDeleting(true);
       await deleteSuspect(suspectToDelete.id);
       setSuspectToDelete(null);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('suspects:changed', { detail: { caseId } }));
+      }
     } finally {
       setIsDeleting(false);
     }
@@ -116,7 +122,7 @@ export const SuspectsSection: React.FC<SuspectsSectionProps> = ({ caseId, isCase
           {isCaseClosed ? (
             <div
               className="flex items-center gap-1.5 px-3 py-1.5 border border-alerta/40 bg-alerta/10 text-alerta text-xs font-mono select-none"
-              title="El caso se encuentra cerrado. No se permite agregar nuevos sospechosos (Regla 3)."
+              title="El caso se encuentra cerrado. No se permite agregar nuevos sospechosos."
             >
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>CASO CERRADO: REGISTRO BLOQUEADO</span>

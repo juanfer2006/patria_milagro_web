@@ -26,15 +26,36 @@ export const suspectsService = {
 
   async create(input: CreateSuspectInput): Promise<Suspect> {
     const res = await httpClient.post<{ data: Suspect }>('/suspects', input);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('suspects:changed', {
+          detail: { caseId: input.caseId, action: 'create', suspect: res.data },
+        }),
+      );
+    }
     return res.data;
   },
 
   async update(id: string, input: UpdateSuspectInput): Promise<Suspect> {
     const res = await httpClient.put<{ data: Suspect }>(`/suspects/${id}`, input);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('suspects:changed', {
+          detail: { suspectId: id, action: 'update', suspect: res.data },
+        }),
+      );
+    }
     return res.data;
   },
 
   async delete(id: string): Promise<void> {
     await httpClient.delete<void>(`/suspects/${id}`);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('suspects:changed', {
+          detail: { suspectId: id, action: 'delete' },
+        }),
+      );
+    }
   },
 };

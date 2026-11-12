@@ -21,6 +21,7 @@ export const EvidencesSection: React.FC<EvidencesSectionProps> = ({ caseId, isCa
     isLoading,
     error,
     refresh,
+    refreshSuspects,
     createEvidence,
     updateEvidence,
     deleteEvidence,
@@ -37,11 +38,13 @@ export const EvidencesSection: React.FC<EvidencesSectionProps> = ({ caseId, isCa
 
   const handleOpenCreate = () => {
     if (isCaseClosed) return;
+    refreshSuspects();
     setEditingEvidence(null);
     setIsFormOpen(true);
   };
 
   const handleOpenEdit = (evidence: Evidence) => {
+    refreshSuspects();
     setEditingEvidence(evidence);
     setIsFormOpen(true);
   };
@@ -135,9 +138,7 @@ export const EvidencesSection: React.FC<EvidencesSectionProps> = ({ caseId, isCa
         >
           <Lock className="w-4 h-4 text-alerta shrink-0 mt-0.5" aria-hidden="true" />
           <div>
-            <strong className="text-alerta uppercase">
-              [REGISTRO BLOQUEADO POR CASO CERRADO &bull; REGLA 3]
-            </strong>
+            <strong className="text-alerta uppercase">[REGISTRO BLOQUEADO POR CASO CERRADO]</strong>
             <p className="mt-0.5 text-papel-dark leading-relaxed font-sans">
               No es posible incorporar nuevas evidencias a una investigación archivada o concluida.
               Sin embargo, las evidencias existentes pueden ser consultadas, modificadas o
